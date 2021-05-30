@@ -51,7 +51,13 @@ function initApp() {
         updateEmpRoles();
       } else if (answer === "View Employees By Manager") {
         viewEmpByManager();
-      } 
+      }  else if (answer === "Delete Department") {
+          deleteDepartments()
+      } else if (answer === "Delete Roles") {
+          deleteRoles()
+      } else if (answer === "Delete Employee") {
+          deleteEmployee()
+      }
     });
 }
 
@@ -275,6 +281,85 @@ function viewEmpByManager() {
         });
       });
   });
+}
+
+function deleteDepartments()  {
+    connection.query(`SELECT * FROM department`, (err, data) => {
+        if (err) throw err;
+
+        inquirer.prompt([{
+            name: "department",
+            type: "list",
+            choices: data.map(i => i.name),
+            message: "select a Department to delete"
+        }])
+        .then(answer => {
+            connection.query(
+                `DELETE FROM department WHERE name="${answer.department}"; `,
+                (err, res) => {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    console.table(res);
+                    initApp();
+                  }
+                }
+              );
+        })
+    })
+}
+
+function deleteRoles()  {
+    connection.query(`SELECT * FROM role`, (err, data) => {
+        if (err) throw err;
+
+        inquirer.prompt([{
+            name: "role",
+            type: "list",
+            choices: data.map(i => i.title),
+            message: "select a Role to delete"
+        }])
+        .then(answer => {
+            connection.query(
+                `DELETE FROM role WHERE title="${answer.role}"; `,
+                (err, res) => {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    console.table(res);
+                    initApp();
+                  }
+                }
+              );
+        })
+    })
+}
+
+function deleteEmployee() {
+    connection.query(getAllTableQuery(), (err, data) => {
+        if (err) throw err;
+        console.table(data)
+
+        connection.query(`SELECT id FROM employee`, (err, res) => {
+            inquirer.prompt([
+                {
+                    name: "ID",
+                    type: "list",
+                    choices: res.map(i => i.id),
+                    message: "Choose Employee by ID to delete"
+                }
+            ])
+            .then(answer => {
+                connection.query(`DELETE FROM employee WHERE id = "${answer.ID}"`, (err, res) => {
+                    if(err) {
+                        console.log(err)
+                    } else {
+                        initApp()
+                    }
+                })
+            })
+        })
+    })
 }
 
 initApp();
