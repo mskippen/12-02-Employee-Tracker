@@ -1,7 +1,5 @@
 const inquirer = require("inquirer");
 const connection = require("./config/connection");
-const express = require("express");
-const app = express();
 function getAllTableQuery() {
   return `SELECT em.id, em.first_name, em.last_name, r.title, d.name AS "Department", r.salary AS "Salary", CONCAT(em.first_name," ",em.last_name) AS "Manager"
     FROM employee em
@@ -31,6 +29,7 @@ function initApp() {
         "Delete Department",
         "Delete Roles",
         "Delete Employee",
+        "Quit App"
       ],
     })
     .then((data) => {
@@ -57,6 +56,9 @@ function initApp() {
           deleteRoles()
       } else if (answer === "Delete Employee") {
           deleteEmployee()
+      } else if (answer === "Quit App") {
+          console.log("You quit")
+          connection.end()
       }
     });
 }
